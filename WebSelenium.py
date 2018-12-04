@@ -35,7 +35,12 @@ class Selenium():
         searchForm = self.driver.find_element_by_id("key")
         searchForm.clear()
         searchForm.send_keys(searchText)
-        searchForm.submit()
+        headPage = self.driver.find_elements_by_xpath('//button[@clstag="h|keycount|head|search_c"]')
+        if (len(headPage) != 0):
+            headPage[0].click()
+        else:
+            childPage = self.driver.find_element_by_css_selector("[class='button cw-icon']")
+            childPage.click()
 
     def searchByBaidu(self, searchText):
         self.driver.find_element_by_id("kw").clear()
@@ -43,6 +48,7 @@ class Selenium():
         self.driver.find_element_by_id("su").click()
 
     def searchByTianMao(self, searchText):
-        searchForm =self.driver.find_element_by_id("mq").clear()
-        searchForm.send_keys(searchText)
-        searchForm.submit()
+        self.driver.find_element_by_id("mq").clear()
+        self.driver.find_element_by_id("mq").send_keys(searchText)
+        aa = self.driver.find_element_by_xpath(".//button[@type='submit']")
+        aa.click()
