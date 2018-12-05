@@ -43,6 +43,7 @@ class FirstGUI(QWidget):
         comboSearch.addItem('Baidu')
         comboSearch.addItem('JD')
         comboSearch.addItem('TianMao')
+        comboSearch.addItem('Google')
         comboSearch.move(100, 50)
         self.lb.move(100, 150)
         comboSearch.activated[str].connect(self.onActivatedForSearch)

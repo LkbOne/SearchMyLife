@@ -5,7 +5,7 @@ class Selenium():
     url_baidu = "https:baidu.com"
     url_jd = "https:jd.com"
     url_tianMao = "https:tmall.com"
-
+    url_google = "https:google.com"
     def __init__(self, text):
         super().__init__()
         self.initWebDriver(text)
@@ -30,6 +30,8 @@ class Selenium():
             self.searchByJd(searchText)
         elif self.url == self.url_tianMao:
             self.searchByTianMao(searchText)
+        elif self.url == self.url_tianMao:
+            self.searchByGoogle(searchText)
 
     def searchByJd(self, searchText):
         searchForm = self.driver.find_element_by_id("key")
@@ -52,3 +54,7 @@ class Selenium():
         self.driver.find_element_by_id("mq").send_keys(searchText)
         aa = self.driver.find_element_by_xpath(".//button[@type='submit']")
         aa.click()
+    def searchByGoogle(self, searchText):
+        searchInput = self.driver.find_element_by_xpath(".//input[@type='search']")
+        searchInput.clear()
+        searchInput.send_keys(searchText)
