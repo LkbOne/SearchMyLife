@@ -68,11 +68,10 @@ class Selenium():
         searchInput.clear()
         searchInput.send_keys(searchText)
         searchInput.submit()
-
     def searchByYoutube(self, searchText):
-        searchInput = self.driver.find_element_by_css_selector("[class='ytd-searchbox']")
-        if (searchInput == None):
-            searchInput = self.driver.find_element_by_css_selector("[class='gLFyf']")
+        searchInput = self.driver.find_element_by_xpath(".//input[@id='search']")
         searchInput.clear()
         searchInput.send_keys(searchText)
         searchInput.submit()
+
+
