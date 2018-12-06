@@ -5,12 +5,37 @@ from WebSelenium import Selenium
 
 
 class FirstGUI(QWidget):
+    windowWidth = 500
+    windowHeight = 200
+
+
+    comboxWidthForSearch = 80
+    comboxHeightForSearch = 25
+    comboxMoveDownForSearch = 0
+    comboxMoveRightForSearch = 0
+
+    comboxWidthForBrower = 80
+    comboxHeightForBrower = 25
+
+    comboxMoveRightForBrower = windowWidth - comboxWidthForBrower
+    comboxMoveDownForBrower = comboxMoveDownForSearch
+
+    textWidht = windowWidth - 1 - comboxWidthForSearch
+    textHeight = 20
+    textMoveDown = comboxHeightForSearch + 1
+    textMoveRight = 0
+
+    buttonMoveDown = comboxHeightForBrower
+    buttonMoveRight = textWidht
+
+    buttonWidth = comboxWidthForSearch
+    buttonHeight = textHeight
     def __init__(self):
         super().__init__()
         self.initUI()
 
     def initUI(self):
-        self.resize(400, 600)
+        self.resize(self.windowWidth, self.windowHeight)
         self.center()
         self.initTextBox()
         self.initComboBoxForBrower()
@@ -21,11 +46,13 @@ class FirstGUI(QWidget):
 
     def initTextBox(self):
         self.textbox = QLineEdit(self)
-        self.textbox.move(20, 20)
-        self.textbox.resize(400,40)
+        self.textbox.move(self.textMoveRight, self.textMoveDown)
+        self.textbox.resize(self.textWidht, self.textHeight)
 
     def initButton(self):
         self.btn = QPushButton('click me', self)
+        self.btn.move(self.buttonMoveRight, self.buttonMoveDown)
+        self.btn.resize(self.buttonWidth, self.buttonHeight)
         self.btn.clicked.connect(self.on_click)
 
     def initComboBoxForBrower(self):
@@ -33,7 +60,8 @@ class FirstGUI(QWidget):
         combo = QComboBox(self)
         combo.addItem('Chrome')
         combo.addItem('Firefox')
-        combo.move(50, 50)
+        combo.resize(self.comboxWidthForBrower, self.comboxHeightForBrower)
+        combo.move(self.comboxMoveRightForBrower, self.comboxMoveDownForBrower)
         self.lb.move(50, 150)
         combo.activated[str].connect(self.onActivatedForBrower)
 
@@ -45,9 +73,11 @@ class FirstGUI(QWidget):
         comboSearch.addItem('TianMao')
         comboSearch.addItem('Google')
         comboSearch.addItem('Youtube')
-        comboSearch.move(100, 50)
+        comboSearch.move(self.comboxMoveRightForSearch, self.comboxMoveDownForSearch)
+        comboSearch.resize(self.comboxWidthForSearch, self.comboxHeightForSearch)
         self.lb.move(100, 150)
         comboSearch.activated[str].connect(self.onActivatedForSearch)
+
     def onActivatedForBrower(self, text):
         self.lb.setText(text)
         self.lb.adjustSize()
@@ -59,6 +89,7 @@ class FirstGUI(QWidget):
     def on_click(self):
         textBoxValue = self.textbox.text()
         self.webView.search(textBoxValue)
+
     def center(self):
         fg = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
