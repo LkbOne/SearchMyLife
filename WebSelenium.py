@@ -7,16 +7,17 @@ class Selenium():
     url_tianMao = "https:tmall.com"
     url_google = "https://www.google.com"
     url_youtube = "https://www.youtube.com"
+
+    url = url_baidu
     def __init__(self, text):
         super().__init__()
         self.initWebDriver(text)
     def initWebDriver(self, text):
-
         if text == "Chrome":
             self.driver = webdriver.Chrome()
 
     def setSearchTarget(self, text):
-        self.url = ""
+
         if text == "Baidu":
             self.url = self.url_baidu
         elif text == "JD":

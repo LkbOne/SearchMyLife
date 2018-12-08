@@ -1,6 +1,9 @@
+import re
 import sys
+
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QDesktopWidget, QLineEdit, QMessageBox, QCheckBox, \
-    QLabel, QComboBox
+    QLabel, QComboBox, QSystemTrayIcon, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from WebSelenium import Selenium
 
 
@@ -40,8 +43,13 @@ class FirstGUI(QWidget):
         self.initTextBox()
         self.initComboBoxForBrower()
         self.initComboBoxForSearchLink()
-        self.initButton()
+        self.initButtonForSearch()
+
+        self.initButtonForTable()
         self.show()
+        self.systemButtonPane()
+        self.inittable()
+
         pass
 
     def initTextBox(self):
@@ -49,11 +57,18 @@ class FirstGUI(QWidget):
         self.textbox.move(self.textMoveRight, self.textMoveDown)
         self.textbox.resize(self.textWidht, self.textHeight)
 
-    def initButton(self):
-        self.btn = QPushButton('click me', self)
-        self.btn.move(self.buttonMoveRight, self.buttonMoveDown)
-        self.btn.resize(self.buttonWidth, self.buttonHeight)
-        self.btn.clicked.connect(self.on_click)
+    def initButtonForSearch(self):
+        self.searchBtn = QPushButton('click me', self)
+        self.searchBtn.move(self.buttonMoveRight, self.buttonMoveDown)
+        self.searchBtn.resize(self.buttonWidth, self.buttonHeight)
+        self.searchBtn.clicked.connect(self.clickForSearch)
+
+    def initButtonForTable(self):
+        self.addItemButton = QPushButton('click me22', self)
+        self.addItemButton.move(self.buttonMoveRight + 30, self.buttonMoveDown + 30)
+        self.addItemButton.resize(self.buttonWidth, self.buttonHeight)
+        self.addItemButton.clicked.connect(self.clickForAddItem)
+
 
     def initComboBoxForBrower(self):
         self.lb = QLabel('打开的浏览器', self)
@@ -78,6 +93,41 @@ class FirstGUI(QWidget):
         self.lb.move(100, 150)
         comboSearch.activated[str].connect(self.onActivatedForSearch)
 
+    def systemButtonPane(self):
+        self.tray = QSystemTrayIcon() #创建系统托盘对象
+        self.icon = QIcon('earth.ico')  #创建图标
+        self.tray.setIcon(self.icon)
+        self.tray.show()#显示系统托盘
+        self.tray.activated[QSystemTrayIcon.ActivationReason].connect(self.iconActivated)
+
+    count = 0
+    countArray = []
+    def inittable(self):
+        self.tableWidget = QTableWidget(0, 2)
+        self.tableWidget.setHorizontalHeaderLabels(['Thing', 'ThingItem'])
+
+    def dealTextForPattern(self, text):
+        seat = re.search(':', text).span()
+        textGroup = []
+        textGroup.append(text[0 : seat[1] - 1])
+        textGroup.append(text[seat[1] : len(text)])
+
+        return textGroup
+    def addTableItem(self, text):
+        text = self.dealTextForPattern(text)
+        self.count += 1
+        self.countArray.append(str(self.count))
+        newItemTitle = QTableWidgetItem(text[0])
+        newItemTing = QTableWidgetItem(text[1])
+        self.tableWidget.setRowCount((self.count))
+        self.tableWidget.setItem(self.count - 1, 0, newItemTitle)
+        self.tableWidget.setItem(self.count - 1, 1, newItemTing)
+        self.tableWidget.setVerticalHeaderLabels(self.countArray)
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.show()
+
+
     def onActivatedForBrower(self, text):
         self.lb.setText(text)
         self.lb.adjustSize()
@@ -86,15 +136,26 @@ class FirstGUI(QWidget):
     def onActivatedForSearch(self, text):
         self.webView.setSearchTarget(text)
 
-    def on_click(self):
+    def clickForSearch(self):
         textBoxValue = self.textbox.text()
         self.webView.search(textBoxValue)
+
+    def clickForAddItem(self):
+        textBoxValue = self.textbox.text()
+        self.addTableItem(textBoxValue)
 
     def center(self):
         fg = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
         fg.moveCenter(cp)
         self.move(fg.topLeft())
+
+    def iconActivated(self, reason):
+        if reason == QSystemTrayIcon.DoubleClick:
+            if self.isHidden():
+                self.show()
+            else:
+                self.hide()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
