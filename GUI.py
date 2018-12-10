@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 
@@ -5,6 +6,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QWidget, QApplication, QPushButton, QDesktopWidget, QLineEdit, QMessageBox, QCheckBox, \
     QLabel, QComboBox, QSystemTrayIcon, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from WebSelenium import Selenium
+from requestBackend import RequestBackend
 
 
 class FirstGUI(QWidget):
@@ -159,5 +161,11 @@ class FirstGUI(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    callBackend = RequestBackend()
+    aa = callBackend.getRequest("http://localhost:9090/searchMyLife/init")
+    # data={'name':'value'}
+    # encode_data= json.dumps(data).encode()
+    name = "12"
+    bb = callBackend.postRequest("http://localhost:9090/searchMyLife/init", name)
     firstGui = FirstGUI()
     sys.exit(app.exec_())
