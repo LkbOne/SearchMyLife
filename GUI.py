@@ -118,10 +118,10 @@ class FirstGUI(QWidget):
         self.count += 1
         self.countArray.append(str(self.count))
         newItemTitle = QTableWidgetItem(text[0])
-        newItemTing = QTableWidgetItem(text[1])
+        newItemThing = QTableWidgetItem(text[1])
         self.tableWidget.setRowCount((self.count))
         self.tableWidget.setItem(self.count - 1, 0, newItemTitle)
-        self.tableWidget.setItem(self.count - 1, 1, newItemTing)
+        self.tableWidget.setItem(self.count - 1, 1, newItemThing)
         self.tableWidget.setVerticalHeaderLabels(self.countArray)
         self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
