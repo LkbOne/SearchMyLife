@@ -1,23 +1,38 @@
 from common.net import RequestBackend
 import json
 class Search():
-    addr = "http://localhost:7070/"
+    addr = "http://120.77.86.76:6060/"
     local = "search/"
 
-    def addSearchInfo(self, ):
-        call = RequestBackend()
-        visit = "addSearchInfo"
-        url = self.addr + self.local + visit
-        param = {
+    def addSearchInfo(self, content, url, type, mainType, traceType):
 
+        visit = "addSearchInfo"
+        inter = self.addr + self.local + visit
+        param = {
+            "content": content,
+            "url": url,
+            "type": type,
+            "mainType": mainType,
+            "traceType": traceType
         }
-        resp = call.postRequest(url, param)
+        resp = RequestBackend().postRequest(inter, param)
         res = json.loads(resp.data)
 
+    def addBatchSearchInfo(self, urls, id):
+        print("id:"+str(id))
+        visit = "addBatchSearchInfo"
+        inter = self.addr + self.local + visit
+        param = {
+            "urls": urls,
+            "uid": id
+        }
+        resp = RequestBackend().postRequest(inter, param)
+        res = json.loads(resp.data)
+        return res
 
     def search(self, type, searchContent):
         call = RequestBackend()
-        addr = "http://localhost:7070/"
+        addr = "http://120.77.86.76:6060/"
         local = "search/"
         visit = "search"
 

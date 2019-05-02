@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QDesktopWidget, QLineEdit, QLa
     QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QListWidget
 from PyQt5 import QtCore
 from service.SearchService import Search
+from service.entity.Station import BaiDuStation, QQVideoStation, QQMusicStation, TianMaoStation, JDStation, \
+    DouBanStation, DouBanBookStation, TaoBaoStation
 from view.ListWidget import ListWidget
 from view.WebSelenium import Selenium
 
@@ -56,15 +58,8 @@ class FirstGUI(QWidget):
         self.inittable()
 
         pass
-    # 初始化listwidget
-    # def initListWidget(self):
-    #     self.listWidget = ListWidget(self)
-    #     self.listWidget.init()
-    #     self.listWidget.move(0,50)
-    #     self.listWidget.resize(200,200)
-
     def initLeftListWidget(self):
-        self.leftListWidget = QListWidget(self)
+        self.leftListWidget = ListWidget(self)
         self.leftListWidget.setGeometry(QtCore.QRect(10, 100, 261, 511))
 
     def initRightListWidget(self):
@@ -92,14 +87,7 @@ class FirstGUI(QWidget):
 
     def initComboBoxForBrower(self):
         self.webView = Selenium('Chrome')
-        # self.lb = QLabel('打开的浏览器', self)
-        # combo = QComboBox(self)
-        # combo.addItem('Chrome')
-        # combo.addItem('Firefox')
-        # combo.resize(self.comboxWidthForBrower, self.comboxHeightForBrower)
-        # combo.move(self.comboxMoveRightForBrower, self.comboxMoveDownForBrower)
-        # self.lb.move(50, 150)
-        # combo.activated[str].connect(self.onActivatedForBrower)
+        self.webDrive = self.webView.driver
 
     def initComboBoxForSearchLink(self):
         self.lbSearch = QLabel('搜索的网址', self)
@@ -112,6 +100,7 @@ class FirstGUI(QWidget):
         comboSearch.addItem('QQMusic')
         comboSearch.addItem('QQVideo')
         comboSearch.addItem('DouBan')
+        comboSearch.addItem('DouBanBook')
         comboSearch.setGeometry(QtCore.QRect(430, 0, 69, 22))
         comboSearch.activated[str].connect(self.onActivatedForSearch)
 
@@ -156,19 +145,68 @@ class FirstGUI(QWidget):
         self.webView = Selenium(text)
 
     def onActivatedForSearch(self, text):
+        self.station = None
+        if text == "Baidu":
+            self.station = BaiDuStation()
+        elif text == "JD":
+            self.station = JDStation()
+        elif text == "TianMao":
+            self.station = TianMaoStation()
+        elif text == "QQMusic":
+            self.station = QQMusicStation()
+        elif text == "QQVideo":
+            self.station = QQVideoStation()
+        elif text == "DouBan":
+            self.station = DouBanStation()
+        elif text == "DouBanBook":
+            self.station = DouBanBookStation()
 
-        self.webView.setSearchTarget(text, None)
+        if self.station is not None:
+            self.station.visitStation(self.webDrive)
 
     def clickForSearch(self):
         textBoxValue = self.textbox.text()
         print("clickForSearch:" + textBoxValue)
-        # search = Search()
-        # list = search.search(1, textBoxValue)
-        list, subList = self.webView.search(textBoxValue)
+        # list, subList = self.webView.search(textBoxValue)
+        self.station.search(self.webDrive, textBoxValue)
+        if type(self.station) == QQMusicStation:
+            self.station.start()
+            self.station.data.connect(self.set_MusicListWidget)
+        if type(self.station) == DouBanBookStation:
+            self.station.start()
+            self.station.data.connect(self.set_DouBanBookListWidget)
+        if type(self.station) == QQVideoStation:
+            self.station.start()
+            self.station.data.connect(self.set_QQVideoListWidget)
+        if type(self.station) == TianMaoStation:
+            self.station.start()
+            self.station.data.connect(self.set_ShopListWidget)
+        if type(self.station) == JDStation:
+            self.station.start()
+            self.station.data.connect(self.set_ShopListWidget)
 
-        # self.upListWidget.updateListWidget(list, self.webView)
-        self.upListWidget.initCustomWidgetItem(subList, self.webView)
-        self.rightListWidget.initRightCustinWidgetItem(list, self.webView)
+    def set_DouBanBookListWidget(self, data):
+        if data is not None:
+            # self.leftListWidget.
+            self.leftListWidget.init_Tian_Mao_Item(data[0], self.station, 2)
+            self.upListWidget.initRightCustinWidgetItem(data[1], self.station, 5)
+            self.rightListWidget.init_Tian_Mao_Item(data[2], self.station, 2)
+
+    def set_MusicListWidget(self, data):
+        if data is not None:
+            self.upListWidget.initCustomWidgetItem(data[0], self.station)
+            self.rightListWidget.initRightCustinWidgetItem(data[1], self.station, 5)
+
+    def set_QQVideoListWidget(self, data):
+        if data is not None and len(data) == 2:
+            if data[0] is not None:
+                 self.upListWidget.init_TX_Video_Item(data[0], self.station, 5)
+            if data[1] is not None:
+                self.rightListWidget.initRightCustinWidgetItem(data[1], self.station, 5)
+    def set_ShopListWidget(self, data):
+        if data is not None:
+            self.upListWidget.init_Tian_Mao_Item(data[0], self.station)
+            self.rightListWidget.init_Tian_Mao_Item(data[1], self.station, 2)
 
     def clickForAddItem(self):
         textBoxValue = self.textbox.text()
@@ -180,6 +218,7 @@ class FirstGUI(QWidget):
         fg.moveCenter(cp)
         self.move(fg.topLeft())
 
+    # 图标作用
     def iconActivated(self, reason):
         if reason == QSystemTrayIcon.DoubleClick:
             if self.isHidden():

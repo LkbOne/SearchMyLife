@@ -9,13 +9,11 @@ import re
 
 from common.JSEngine import JSEngine
 from result.DouBanResult import DoubanResult
-from result.QQMusicResult import QQMusicResult
+from result.TXResult import QQMusicResult
+from service.entity.Station import BaiDuStation, QQMusicStation, QQVideoStation
 
 
 class Selenium(QtCore.QThread):
-    _signal = pyqtSignal(str)
-
-
     url_baidu = "https:baidu.com"
     url_jd = "https:jd.com"
     url_tianMao = "https:tmall.com"
@@ -29,57 +27,29 @@ class Selenium(QtCore.QThread):
     def __init__(self, text):
         super(Selenium, self).__init__()
         self.initWebDriver(text)
-        self.url = self.url_baidu
-        self.driver.get(self.url)
+        self.station = BaiDuStation()
+        self.station.visitStation(self.driver)
         self.jsEngine = JSEngine()
     def initWebDriver(self, text):
         if text == "Chrome":
-            self.driver = webdriver.Chrome()
+            options = webdriver.ChromeOptions()
+            options.add_argument('--log-level=3')
+            self.driver = webdriver.Chrome(chrome_options = options)
 
-    def setSearchTarget(self, text, url):
-        print("url:" + str(text))
-        if text == "Baidu" and url is None:
-            self.url = self.url_baidu
-        elif text == "JD" and url is None:
-            self.url = self.url_jd
-        elif text == "TianMao" and url is None:
-            self.url = self.url_tianMao
-        elif text == "Google" and url is None:
-            self.url = self.url_google
-        elif text == "Youtube" and url is None:
-            self.url = self.url_youtube
-        elif text == "QQMusic" and url is None:
-            self.url = self.url_qqMusic
-        elif text == "QQVideo" and url is None:
-            self.url = self.url_qqVideo
-        elif text == "DouBan" and url is None:
-            self.url = self.url_douBan
+    def setSearchTarget(self, station):
+        self.station = station
+        station.visitStation(self.driver)
 
-        if url is not None and text is not None:
-            self.driver.get(url)
-        if url is not None and text is None:
-            self.driver.get(url)
-        if text is not None and url is None:
-            self.driver.get(self.url)
+        # if url is not None and text is not None:
+        #     self.driver.get(url)
+        # if url is not None and text is None:
+        #     self.driver.get(url)
+        # if text is not None and url is None:
+        #     self.driver.get(self.url)
 
     def search(self, searchText):
-        print("search url:" + self.url)
-        if self.url == self.url_baidu:
-            self.searchByBaidu(searchText)
-        elif self.url == self.url_jd:
-            self.searchByJd(searchText)
-        elif self.url == self.url_tianMao:
-            self.searchByTianMao(searchText)
-        elif self.url == self.url_google:
-            self.searchByGoogle(searchText)
-        elif self.url == self.url_youtube:
-            self.searchYoutube(searchText)
-        elif self.url == self.url_qqMusic:
-            return self.searchQQMusic(searchText)
-        elif self.url == self.url_qqVideo:
-            return self.searchQQVideo(searchText)
-        elif self.url == self.url_douBan:
-            self.searchDouBan(searchText)
+        self.station.search(self.driver, searchText)
+
 
 
     def searchByJd(self, searchText):
